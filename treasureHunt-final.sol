@@ -60,10 +60,16 @@ contract TreasureHunt {
     //功能：發送以太幣
     function fund(uint winner) public payable{
         address payable eth_address; //重新定義一個新的地址，因為僅payable型態可以發送ETH
-        if (msg.sender != owner || complete || rewarded) revert(); //不符合條件而終止執行，消耗所有 gas
-        eth_address=payable(playtime[winner].play_address); //將地址轉成payable(可發送地址)
-        eth_address.transfer(playtime[winner].amount*150/100); //solidity不支援小數點，所以要先*150再/100
-        rewarded = true; //通關狀態：是
-        complete = true; //遊戲狀態：已結束
+        if (msg.sender != owner || _complete || _rewarded) revert(); //不符合條件而終止執行，消耗所有 gas
+        for(uint i=0; i <  numPlay ; i++ ) {
+            eth_address=payable(playtime[i].play_address); //將玩家地址轉成payable(可發送地址)
+            if(i == winner){
+                eth_address.transfer(playtime[winner].amount*150/100); //solidity不支援小數點，所以獎勵要先*150再/100
+            }else{
+                eth_address.transfer(msg.value);
+            }
+        }
+        _rewarded = true; //通關狀態：是
+        _complete = true; //遊戲狀態：已結束
     }
 }
